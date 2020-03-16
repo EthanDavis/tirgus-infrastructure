@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
 terraform {
@@ -12,9 +12,6 @@ terraform {
 
 data "aws_caller_identity" "current" {}
 
-data "aws_secretsmanager_secret" "db_credentials" {
-  name = "poc/postrges-credentials"
-}
 
 resource "aws_db_instance" "postgres_instance" {
   allocated_storage = 20
@@ -22,8 +19,21 @@ resource "aws_db_instance" "postgres_instance" {
   engine = "postgres"
   engine_version = "9.6.3"
   instance_class = "db.t2.micro"
-  name = "tirgus-api-db"
-  username = "${data.aws_secretsmanager_secret.db_credentials["user"]}"
-  password = "${data.aws_secretsmanager_secret.db_credentials["password"]}"
+  name = "tirgusApiDb"
+  identifier = "tirgus-api-db"
+  username = "ENTER_USER"
+  password = "ENTER_PASSWORD"
+  parameter_group_name = aws_db_parameter_group.postgres_db.name
+}
+
+
+resource "aws_db_parameter_group" "postgres_db" {
+  name   = "postgres-database"
   family = "postgres9.6"
+
+  parameter {
+    name         = "rds.force_ssl"
+    value        = "1"
+    apply_method = "pending-reboot"
+  }
 }
