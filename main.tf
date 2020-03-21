@@ -25,13 +25,12 @@ resource "secrethub_secret" "db_password" {
   path = "${local.secrethub_dir}/db/password"
 
   generate {
-    length      = 22
-    use_symbols = true
+    length = 22
   }
 }
 
 resource "secrethub_secret" "db_user" {
-  path  = "${local.secrethub_dir}/db/user"
+  path = "${local.secrethub_dir}/db/user"
   value = "schema_user"
 }
 
@@ -44,18 +43,11 @@ resource "aws_db_instance" "postgres_instance" {
   name = "tirgusApiDb"
   identifier = "tirgus-api-db"
   username = secrethub_secret.db_user.value
-  password =  secrethub_secret.db_password.value
-  parameter_group_name = aws_db_parameter_group.postgres_db.name
+  password = secrethub_secret.db_password.value
+  publicly_accessible = true
+  final_snapshot_identifier = "tirgus-api-db-final-SNAPSHOT"
+  parameter_group_name = "default.postgres9.6"
+
 }
 
 
-resource "aws_db_parameter_group" "postgres_db" {
-  name   = "postgres-database"
-  family = "postgres9.6"
-
-  parameter {
-    name         = "rds.force_ssl"
-    value        = "1"
-    apply_method = "pending-reboot"
-  }
-}
