@@ -18,7 +18,7 @@ data "aws_caller_identity" "current" {}
 
 
 locals {
-  secrethub_dir = "tirgus-api/poc"
+  secrethub_dir = "ethan-davis/tirgus-api/poc"
 }
 
 resource "secrethub_secret" "db_password" {
